@@ -1,0 +1,27 @@
+[project]
+name = "glassbox"
+version = "0.1.0"
+description = "White-box AutoML library"
+
+# Runtime dependencies
+# Install with `pip install .`
+dependencies = [
+    "numpy",
+]
+
+# Dev dependencies
+# Install with `pip install .[dev]`
+[project.optional-dependencies]
+dev = [
+    "black",
+    "ruff",
+]
+
+[tool.black]
+line-length = 90
+target-version = ["py311"]
+
+[tool.ruff]
+ignore = ["E501"]
+select = ["E", "F", "W", "I"]
+fix = true
