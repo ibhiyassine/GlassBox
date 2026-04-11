@@ -46,7 +46,10 @@ def read_csv(filepath: str) -> Dataset:
 
     for r, row in enumerate(rows):
         for c, cell in enumerate(row):
-            data[r, c] = cell
+            if cell == "" or cell.upper() == "NA":
+                data[r, c] = np.nan
+            else:
+                data[r, c] = cell
 
     # Try to cast each column to float; leave as object if it fails
     float_data = np.empty((n_rows, n_cols), dtype=float)
