@@ -29,7 +29,17 @@ class OneHotEncoder(BaseTransformer):
         Self
             Fitted encoder instance.
         """
-        raise NotImplementedError
+        n_features = X.shape[1]
+        for col_idx in range(n_features):
+            col = X[:, col_idx]
+            if np.issubdtype(col.dtype, np.number):
+                col_clean = col[~np.isnan(col)]
+            else:
+                col_clean = np.array([x for x in col if x is not None and not (isinstance(x, float) and np.isnan(x))])
+
+            uniques = np.unique(col_clean)
+            self._categories[col_idx] = list(uniques)
+        return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
         """
@@ -45,7 +55,25 @@ class OneHotEncoder(BaseTransformer):
         np.ndarray
             Transformed array properly encoded.
         """
-        raise NotImplementedError
+        n_features = X.shape[1]
+        out_cols = []
+        for col_idx in range(n_features):
+            col = X[:, col_idx]
+            cats = self._categories.get(col_idx, [])
+            if not cats:
+                continue
+
+            for cat in cats:
+                if isinstance(cat, float) and np.isnan(cat):
+                    continue
+                # For string objects, equal checking doesn't break, generates boolean mask
+                mask = (col == cat).astype(float)
+                out_cols.append(mask)
+
+        if not out_cols:
+            return np.empty((X.shape[0], 0))
+
+        return np.column_stack(out_cols)
 
 
 class LabelEncoder(BaseTransformer):
@@ -72,7 +100,15 @@ class LabelEncoder(BaseTransformer):
         Self
             Fitted encoder instance.
         """
-        raise NotImplementedError
+        X_flat = X.ravel()
+        if np.issubdtype(X_flat.dtype, np.number):
+            X_clean = X_flat[~np.isnan(X_flat)]
+        else:
+            X_clean = np.array([x for x in X_flat if x is not None and not (isinstance(x, float) and np.isnan(x))])
+
+        uniques = np.unique(X_clean)
+        self._mapping = {str(val): i for i, val in enumerate(uniques)}
+        return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
         """
@@ -88,4 +124,13 @@ class LabelEncoder(BaseTransformer):
         np.ndarray
             Transformed array properly encoded.
         """
-        raise NotImplementedError
+        X_flat = X.ravel()
+        res = np.zeros(X_flat.shape, dtype=float)
+
+        for i, val in enumerate(X_flat):
+            if (isinstance(val, float) and np.isnan(val)) or val is None:
+                res[i] = np.nan
+            else:
+                res[i] = self._mapping.get(str(val), -1)
+
+        return res.reshape(X.shape)
