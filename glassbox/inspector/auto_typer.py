@@ -28,7 +28,7 @@ class AutoTyper:
         results = {}
         for col_name in data.columns:
             col_data = data.get_columns(col_name).data[:, 0]
-            
+
             if self._is_boolean(col_data):
                 results[col_name] = FeatureType.BOOLEAN
             elif self._is_numeric(col_data):
@@ -56,18 +56,18 @@ class AutoTyper:
         """
         col_float = col.astype(float)
         col_valid = col_float[~np.isnan(col_float)]
-        
+
         if len(col_valid) == 0:
             return False
-            
+
         # Check if all valid numbers are whole integers
         if not np.all(np.mod(col_valid, 1) == 0):
             return False
-            
+
         # Check cardinality
         if len(np.unique(col_valid)) < 20:
             return True
-            
+
         return False
 
     def _is_boolean(self, col: np.ndarray) -> bool:
@@ -88,7 +88,7 @@ class AutoTyper:
             col_float = col.astype(float)
             col_valid = col_float[~np.isnan(col_float)]
             return len(np.unique(col_valid)) == 2
-        
+
         # for object/string type columns, drop None or np.nan-like strings
         try:
             uniq = np.unique(col)

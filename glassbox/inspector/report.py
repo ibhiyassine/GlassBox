@@ -2,7 +2,7 @@ import dataclasses
 import json
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import numpy as np
 
@@ -102,7 +102,7 @@ class EDAReport:
                 if isinstance(obj, float) and np.isnan(obj):
                     return None
                 return super().default(obj)
-        
+
         # We need to handle nan to null if missing, but json.dumps handles nan by default to NaN.
         # But JSON standard doesn't support NaN, so let's allow it standard.
         return json.dumps(dataclasses.asdict(self), cls=EnumEncoder)

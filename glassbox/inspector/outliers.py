@@ -1,7 +1,8 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import numpy as np
 
+from glassbox.core.math import calc_iqr
 from glassbox.frame.dataset import Dataset
 from glassbox.inspector.report import OutlierInfo
 
@@ -35,40 +36,8 @@ class OutlierDetector:
             if len(col_valid) == 0:
                 results[col_name] = OutlierInfo(count=0, lower_bound=float("nan"), upper_bound=float("nan"))
                 continue
-            lower, upper = self._calc_iqr(col_valid)
+            lower, upper = calc_iqr(col_valid)
+
             count = int(np.sum((col_valid < lower) | (col_valid > upper)))
             results[col_name] = OutlierInfo(count=count, lower_bound=lower, upper_bound=upper)
         return results
-
-    def _calc_iqr(self, col: np.ndarray) -> Tuple[float, float]:
-        """
-        Calculate the Interquartile Range (IQR) for a column.
-
-        Parameters
-        ----------
-        col : np.ndarray
-            Numeric input array of shape (n_samples,).
-
-        Returns
-        -------
-        Tuple
-            A tuple containing (lower_bound, upper_bound).
-        """
-        sorted_col = np.sort(col)
-        n = len(sorted_col)
-        if n == 0:
-            return 0.0, 0.0
-
-        def get_percentile(p: float) -> float:
-            idx = (n - 1) * p / 100.0
-            idx_int = int(idx)
-            if idx_int == n - 1:
-                return float(sorted_col[idx_int])
-            fraction = idx - idx_int
-            return float(sorted_col[idx_int] + fraction * (sorted_col[idx_int + 1] - sorted_col[idx_int]))
-
-        q1 = get_percentile(25.0)
-        q3 = get_percentile(75.0)
-        iqr = q3 - q1
-
-        return float(q1 - 1.5 * iqr), float(q3 + 1.5 * iqr)

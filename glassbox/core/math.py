@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import numpy as np
 
 
@@ -223,6 +225,57 @@ def calc_cramers_v(arr_x: np.ndarray, arr_y: np.ndarray) -> float:
 
     v = np.sqrt(phi2 / min_dim)
     return float(v)
+
+
+def calc_percentile(arr: np.ndarray, p: float) -> float:
+    """
+    Calculate the precise percentile of an array using interpolation.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array dimension to extract percentile from.
+    p : float
+        Percentile range (0-100).
+
+    Returns
+    -------
+    float
+        Calculated percentile.
+    """
+    sorted_col = np.sort(arr)
+    n = len(sorted_col)
+    if n == 0:
+        return 0.0
+    idx = (n - 1) * p / 100.0
+    idx_int = int(idx)
+    if idx_int == n - 1:
+        return float(sorted_col[idx_int])
+    fraction = idx - idx_int
+    return float(sorted_col[idx_int] + fraction * (sorted_col[idx_int + 1] - sorted_col[idx_int]))
+
+
+def calc_iqr(arr: np.ndarray) -> Tuple[float, float]:
+    """
+    Calculate the Interquartile Range (IQR) bounds.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array to bound.
+
+    Returns
+    -------
+    Tuple
+        Tuple containing parameters for lower and upper limits.
+    """
+    n = len(arr)
+    if n == 0:
+        return 0.0, 0.0
+    q1 = calc_percentile(arr, 25.0)
+    q3 = calc_percentile(arr, 75.0)
+    iqr = q3 - q1
+    return float(q1 - 1.5 * iqr), float(q3 + 1.5 * iqr)
 
 
 # ─[ Tree Statistics ]──────────────────────────────────────────────────
