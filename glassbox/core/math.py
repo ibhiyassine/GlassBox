@@ -223,3 +223,63 @@ def calc_cramers_v(arr_x: np.ndarray, arr_y: np.ndarray) -> float:
 
     v = np.sqrt(phi2 / min_dim)
     return float(v)
+
+
+# ─[ Tree Statistics ]──────────────────────────────────────────────────
+def calc_split_gain(
+    parent_cost: float,
+    left_cost: float,
+    right_cost: float,
+    n_parent: int,
+    n_left: int,
+    n_right: int,
+) -> float:
+    """
+    Calculate the information gain or variance reduction of a split.
+
+    Parameters
+    ----------
+    parent_cost : float
+        Cost of the parent node.
+    left_cost : float
+        Cost of the left child node.
+    right_cost : float
+        Cost of the right child node.
+    n_parent : int
+        Number of samples in the parent node.
+    n_left : int
+        Number of samples in the left child node.
+    n_right : int
+        Number of samples in the right child node.
+
+    Returns
+    -------
+    float
+        The calculated gain.
+    """
+    weight_left = n_left / n_parent
+    weight_right = n_right / n_parent
+    child_cost = (weight_left * left_cost) + (weight_right * right_cost)
+    return float(parent_cost - child_cost)
+
+
+def calc_gini_impurity(arr: np.ndarray) -> float:
+    """
+    Calculate the Gini impurity of an array of categorical labels.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array of categorical labels, shape (n_samples,).
+
+    Returns
+    -------
+    float
+        Calculated Gini impurity.
+    """
+    n = len(arr)
+    if n == 0:
+        return 0.0
+    _, counts = np.unique(arr, return_counts=True)
+    probabilities = counts / n
+    return float(1.0 - np.sum(probabilities**2))
