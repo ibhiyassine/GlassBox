@@ -90,6 +90,71 @@ def calc_std(arr: np.ndarray) -> float:
     return float(np.sqrt(var))
 
 
+def calc_variance(arr: np.ndarray) -> float:
+    """
+    Calculate the variance (MSE) of a 1D array.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array of continuous values, shape (n_samples,).
+
+    Returns
+    -------
+    float
+        Calculated variance.
+    """
+    n = len(arr)
+    if n == 0:
+        return 0.0
+    mean_val = float(np.sum(arr) / n)
+    return float(np.sum((arr - mean_val) ** 2) / n)
+
+
+# ─[ Ensemble Statistics ]──────────────────────────────────────────────
+def generate_bootstrap_indices(n_samples: int) -> np.ndarray:
+    """
+    Generate random indices for a bootstrap sample.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of samples in the original dataset.
+
+    Returns
+    -------
+    np.ndarray
+        Array of bootstrapped indices of shape (n_samples,).
+    """
+    if n_samples == 0:
+        return np.array([], dtype=int)
+    return np.random.choice(n_samples, size=n_samples, replace=True)
+
+
+def generate_feature_subset_indices(n_features: int) -> np.ndarray:
+    """
+    Generate random indices for a feature subset (sqrt of total features).
+
+    Parameters
+    ----------
+    n_features : int
+        Number of total features.
+
+    Returns
+    -------
+    np.ndarray
+        Array of subset feature indices.
+    """
+    if n_features == 0:
+        return np.array([], dtype=int)
+
+    n_subset = int(np.sqrt(n_features))
+    if n_subset == 0:
+        n_subset = 1
+
+    return np.random.choice(n_features, size=n_subset, replace=False)
+
+
 def calc_skew(arr: np.ndarray) -> float:
     """
     Calculate the skewness of a 1D array.
@@ -252,7 +317,9 @@ def calc_percentile(arr: np.ndarray, p: float) -> float:
     if idx_int == n - 1:
         return float(sorted_col[idx_int])
     fraction = idx - idx_int
-    return float(sorted_col[idx_int] + fraction * (sorted_col[idx_int + 1] - sorted_col[idx_int]))
+    return float(
+        sorted_col[idx_int] + fraction * (sorted_col[idx_int + 1] - sorted_col[idx_int])
+    )
 
 
 def calc_iqr(arr: np.ndarray) -> Tuple[float, float]:

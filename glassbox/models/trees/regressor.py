@@ -1,5 +1,6 @@
 import numpy as np
 
+from glassbox.core.math import calc_mean, calc_variance
 from glassbox.models.trees._base import BaseTree
 
 
@@ -22,7 +23,7 @@ class DecisionTreeRegressor(BaseTree):
         float
             The computed cost (variance) value.
         """
-        pass
+        return calc_variance(y)
 
     def _create_leaf_value(self, y: np.ndarray) -> float:
         """
@@ -38,4 +39,4 @@ class DecisionTreeRegressor(BaseTree):
         float
             The predicted mean value.
         """
-        pass
+        return calc_mean(y)
