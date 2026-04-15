@@ -44,15 +44,23 @@ class DataAuditor:
                 for v in col_data:
                     if v is None or (isinstance(v, float) and np.isnan(v)):
                         missing += 1
-            missing_values[col_name] = MissingInfo(count=missing, percentage=missing / n_samples)
+            missing_values[col_name] = MissingInfo(
+                count=missing, percentage=missing / n_samples
+            )
 
         numeric_cols = [c for c, t in feature_types.items() if t == FeatureType.NUMERICAL]
-        categorical_cols = [c for c, t in feature_types.items() if t in (FeatureType.NOMINAL, FeatureType.ORDINAL, FeatureType.BOOLEAN)]
+        categorical_cols = [
+            c
+            for c, t in feature_types.items()
+            if t in (FeatureType.NOMINAL, FeatureType.ORDINAL, FeatureType.BOOLEAN)
+        ]
 
         outliers_info = outlier_detector.flag_outliers(data, numeric_cols)
         num_stats = stat_profiler.calculate_numeric_stats(data, numeric_cols)
         cat_stats = stat_profiler.calculate_categorical_stats(data, categorical_cols)
-        collinearity_map = association_analyzer.build_associations(data, numeric_cols, categorical_cols)
+        collinearity_map = association_analyzer.build_associations(
+            data, numeric_cols, categorical_cols
+        )
 
         summary_stats = {**num_stats, **cat_stats}
 
@@ -61,5 +69,5 @@ class DataAuditor:
             missing_values=missing_values,
             outliers_info=outliers_info,
             summary_stats=summary_stats,
-            collinearity_map=collinearity_map
+            collinearity_map=collinearity_map,
         )

@@ -37,16 +37,19 @@ class OutlierCapper(BaseTransformer):
             if np.issubdtype(col.dtype, np.number):
                 col_clean = col[~np.isnan(col)]
             else:
-                col_clean = np.array([x for x in col if x is not None and not (isinstance(x, float) and np.isnan(x))])
+                col_clean = np.array(
+                    [
+                        x
+                        for x in col
+                        if x is not None and not (isinstance(x, float) and np.isnan(x))
+                    ]
+                )
 
             if len(col_clean) == 0:
                 self._bounds[str(col_idx)] = {"lower": 0.0, "upper": 1.0}
             else:
                 lower, upper = calc_iqr(col_clean)
-                self._bounds[str(col_idx)] = {
-                    "lower": lower,
-                    "upper": upper
-                }
+                self._bounds[str(col_idx)] = {"lower": lower, "upper": upper}
         return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
@@ -79,7 +82,9 @@ class OutlierCapper(BaseTransformer):
                 mask_clean = np.array([v is not None for v in col])
                 # Objects might fail if not numbers under the hood
                 try:
-                    X_out[mask_clean, col_idx] = np.clip(col[mask_clean].astype(float), lower, upper)
+                    X_out[mask_clean, col_idx] = np.clip(
+                        col[mask_clean].astype(float), lower, upper
+                    )
                 except ValueError:
                     pass
         return X_out

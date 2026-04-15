@@ -29,7 +29,11 @@ class SimpleImputer(BaseTransformer):
 
     __slots__ = ["_strategy", "_constant_value", "_fill_values"]
 
-    def __init__(self, strategy: ImputationStrategy = ImputationStrategy.MEAN, constant_value: Union[float, str, None] = 0.0):
+    def __init__(
+        self,
+        strategy: ImputationStrategy = ImputationStrategy.MEAN,
+        constant_value: Union[float, str, None] = 0.0,
+    ):
         """
         Parameters
         ----------
@@ -63,7 +67,14 @@ class SimpleImputer(BaseTransformer):
             if np.issubdtype(col.dtype, np.number):
                 col_clean = col[~np.isnan(col)]
             else:
-                col_clean = col[np.array([v is not None and not (isinstance(v, float) and np.isnan(v)) for v in col])]
+                col_clean = col[
+                    np.array(
+                        [
+                            v is not None and not (isinstance(v, float) and np.isnan(v))
+                            for v in col
+                        ]
+                    )
+                ]
 
             if len(col_clean) == 0:
                 self._fill_values[str(col_idx)] = 0.0
@@ -107,7 +118,9 @@ class SimpleImputer(BaseTransformer):
                 mask = np.isnan(col)
                 X_out[mask, col_idx] = fill_val
             else:
-                mask = np.array([v is None or (isinstance(v, float) and np.isnan(v)) for v in col])
+                mask = np.array(
+                    [v is None or (isinstance(v, float) and np.isnan(v)) for v in col]
+                )
                 X_out[mask, col_idx] = fill_val
 
         return X_out

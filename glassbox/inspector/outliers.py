@@ -34,10 +34,14 @@ class OutlierDetector:
             col_data = data.get_columns(col_name).data[:, 0].astype(float)
             col_valid = col_data[~np.isnan(col_data)]
             if len(col_valid) == 0:
-                results[col_name] = OutlierInfo(count=0, lower_bound=float("nan"), upper_bound=float("nan"))
+                results[col_name] = OutlierInfo(
+                    count=0, lower_bound=float("nan"), upper_bound=float("nan")
+                )
                 continue
             lower, upper = calc_iqr(col_valid)
 
             count = int(np.sum((col_valid < lower) | (col_valid > upper)))
-            results[col_name] = OutlierInfo(count=count, lower_bound=lower, upper_bound=upper)
+            results[col_name] = OutlierInfo(
+                count=count, lower_bound=lower, upper_bound=upper
+            )
         return results

@@ -95,6 +95,7 @@ class EDAReport:
         str
             JSON representation of the report.
         """
+
         class EnumEncoder(json.JSONEncoder):
             def default(self, obj):
                 if isinstance(obj, Enum):

@@ -40,7 +40,13 @@ class StandardScaler(BaseTransformer):
             if np.issubdtype(col.dtype, np.number):
                 col_clean = col[~np.isnan(col)]
             else:
-                col_clean = np.array([x for x in col if x is not None and not (isinstance(x, float) and np.isnan(x))])
+                col_clean = np.array(
+                    [
+                        x
+                        for x in col
+                        if x is not None and not (isinstance(x, float) and np.isnan(x))
+                    ]
+                )
 
             if len(col_clean) == 0:
                 means.append(0.0)
@@ -78,7 +84,9 @@ class StandardScaler(BaseTransformer):
             for col_idx in range(X_out.shape[1]):
                 col = X_out[:, col_idx]
                 mask = np.array([v is not None for v in col])
-                X_out[mask, col_idx] = (col[mask] - self._mean[col_idx]) / self._std[col_idx]
+                X_out[mask, col_idx] = (col[mask] - self._mean[col_idx]) / self._std[
+                    col_idx
+                ]
 
         return X_out
 
@@ -117,7 +125,13 @@ class MinMaxScaler(BaseTransformer):
             if np.issubdtype(col.dtype, np.number):
                 col_clean = col[~np.isnan(col)]
             else:
-                col_clean = np.array([x for x in col if x is not None and not (isinstance(x, float) and np.isnan(x))])
+                col_clean = np.array(
+                    [
+                        x
+                        for x in col
+                        if x is not None and not (isinstance(x, float) and np.isnan(x))
+                    ]
+                )
 
             if len(col_clean) == 0:
                 mins.append(0.0)
@@ -154,6 +168,8 @@ class MinMaxScaler(BaseTransformer):
             for col_idx in range(X_out.shape[1]):
                 col = X_out[:, col_idx]
                 mask = np.array([v is not None for v in col])
-                X_out[mask, col_idx] = (col[mask] - self._min[col_idx]) / range_vals[col_idx]
+                X_out[mask, col_idx] = (col[mask] - self._min[col_idx]) / range_vals[
+                    col_idx
+                ]
 
         return X_out

@@ -35,7 +35,13 @@ class OneHotEncoder(BaseTransformer):
             if np.issubdtype(col.dtype, np.number):
                 col_clean = col[~np.isnan(col)]
             else:
-                col_clean = np.array([x for x in col if x is not None and not (isinstance(x, float) and np.isnan(x))])
+                col_clean = np.array(
+                    [
+                        x
+                        for x in col
+                        if x is not None and not (isinstance(x, float) and np.isnan(x))
+                    ]
+                )
 
             uniques = np.unique(col_clean)
             self._categories[col_idx] = list(uniques)
@@ -104,7 +110,13 @@ class LabelEncoder(BaseTransformer):
         if np.issubdtype(X_flat.dtype, np.number):
             X_clean = X_flat[~np.isnan(X_flat)]
         else:
-            X_clean = np.array([x for x in X_flat if x is not None and not (isinstance(x, float) and np.isnan(x))])
+            X_clean = np.array(
+                [
+                    x
+                    for x in X_flat
+                    if x is not None and not (isinstance(x, float) and np.isnan(x))
+                ]
+            )
 
         uniques = np.unique(X_clean)
         self._mapping = {str(val): i for i, val in enumerate(uniques)}
