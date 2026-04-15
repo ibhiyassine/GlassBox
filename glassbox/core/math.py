@@ -403,3 +403,42 @@ def calc_gini_impurity(arr: np.ndarray) -> float:
     _, counts = np.unique(arr, return_counts=True)
     probabilities = counts / n
     return float(1.0 - np.sum(probabilities**2))
+
+
+# ─[ Distances ]────────────────────────────────────────────────────────
+def calc_euclidean(x: np.ndarray, y: np.ndarray) -> float:
+    """
+    Calculate the Euclidean distance between two vectors.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        First numeric array.
+    y : np.ndarray
+        Second numeric array.
+
+    Returns
+    -------
+    float
+        Euclidean distance.
+    """
+    return float(np.sqrt(np.sum((x - y) ** 2)))
+
+
+def calc_manhattan(x: np.ndarray, y: np.ndarray) -> float:
+    """
+    Calculate the Manhattan distance between two vectors.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        First numeric array.
+    y : np.ndarray
+        Second numeric array.
+
+    Returns
+    -------
+    float
+        Manhattan distance.
+    """
+    return float(np.sum(np.abs(x - y)))
