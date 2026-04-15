@@ -14,6 +14,9 @@ from glassbox.models import (
     DecisionTreeClassifier,
     DistanceMetric,
     KNeighborsClassifier,
+    LearningSchedule,
+    LinearRegression,
+    LogisticRegression,
     RandomForestClassifier,
     SearchAlgorithm,
 )
@@ -148,6 +151,74 @@ def main():
     for i in range(min(15, len(y_test))):
         match = "✓" if preds_rf[i] == y_test[i] else "✗"
         print(f"[{match}] Predicted: {preds_rf[i]:>10} | Actual: {y_test[i]:>10}")
+
+    print("\n" + "=" * 50)
+    print("LINEAR REGRESSION TEST")
+    print("=" * 50)
+
+    X_linear = np.array([[-1.0], [-0.5], [0.0], [0.5], [1.0], [1.5]])
+    y_linear = np.array([-1.0, 0.5, 2.0, 3.5, 5.0, 6.5])
+
+    lin = LinearRegression(
+        learning_rate=0.05,
+        max_epochs=5000,
+        tol=1e-10,
+        schedule=LearningSchedule.CONSTANT,
+    )
+    lin.fit(X_linear, y_linear)
+    lin_preds = lin.predict(X_linear)
+    lin_mse = np.mean((lin_preds - y_linear) ** 2)
+
+    print(f"LinearRegression train MSE (constant): {lin_mse:.8f}")
+    print(f"LinearRegression prediction for x=2: {lin.predict(np.array([[2.0]]))[0]:.6f}")
+
+    lin_decay = LinearRegression(
+        learning_rate=0.2,
+        max_epochs=5000,
+        tol=1e-10,
+        schedule=LearningSchedule.TIME_DECAY,
+    )
+    lin_decay.fit(X_linear, y_linear)
+    lin_decay_mse = np.mean((lin_decay.predict(X_linear) - y_linear) ** 2)
+    print(f"LinearRegression train MSE (time decay): {lin_decay_mse:.8f}")
+
+    print("\n" + "=" * 50)
+    print("LOGISTIC REGRESSION TEST")
+    print("=" * 50)
+
+    X_log = np.array(
+        [
+            [0.0, 0.0],
+            [0.2, 0.1],
+            [0.4, 0.3],
+            [1.0, 1.1],
+            [1.2, 1.0],
+            [1.4, 1.3],
+        ]
+    )
+    y_log = np.array([0, 0, 0, 1, 1, 1])
+
+    log = LogisticRegression(
+        learning_rate=0.2,
+        max_epochs=5000,
+        tol=1e-10,
+        schedule=LearningSchedule.EXPONENTIAL,
+    )
+    log.fit(X_log, y_log)
+    log_probs = log.predict_proba(X_log)
+    log_preds = log.predict(X_log)
+    log_accuracy = np.mean(log_preds == y_log)
+
+    print(f"LogisticRegression train accuracy: {log_accuracy * 100:.2f}%")
+    print(f"LogisticRegression probabilities: {np.round(log_probs, 4)}")
+
+    assert (
+        lin_mse < 1e-8
+    ), "LinearRegression (constant schedule) did not converge as expected"
+    assert (
+        lin_decay_mse < 2e-2
+    ), "LinearRegression (time decay schedule) did not converge as expected"
+    assert log_accuracy >= 1.0, "LogisticRegression failed on linearly separable toy data"
 
 
 if __name__ == "__main__":

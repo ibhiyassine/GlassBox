@@ -1,5 +1,11 @@
 from ._base import BaseModel
 from .ensemble import RandomForestClassifier, RandomForestRegressor
+from .linear_model import (
+    BaseLinearModel,
+    LearningSchedule,
+    LinearRegression,
+    LogisticRegression,
+)
 from .neighbors import (
     DistanceMetric,
     KNeighborsClassifier,
@@ -18,4 +24,8 @@ __all__ = [
     "DecisionTreeRegressor",
     "RandomForestClassifier",
     "RandomForestRegressor",
+    "LearningSchedule",
+    "BaseLinearModel",
+    "LinearRegression",
+    "LogisticRegression",
 ]
