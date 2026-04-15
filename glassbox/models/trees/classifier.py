@@ -25,7 +25,7 @@ class DecisionTreeClassifier(BaseTree):
         """
         return calc_gini_impurity(y)
 
-    def _create_leaf_value(self, y: np.ndarray) -> float:
+    def _create_leaf_value(self, y: np.ndarray) -> float | str:
         """
         Computes the most common class label for a leaf node.
 
@@ -36,7 +36,7 @@ class DecisionTreeClassifier(BaseTree):
 
         Returns
         -------
-        float
+        float | str
             The predicted class label.
         """
-        return float(calc_mode(y))
+        return calc_mode(y)

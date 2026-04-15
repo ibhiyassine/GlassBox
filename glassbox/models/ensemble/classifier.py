@@ -59,4 +59,4 @@ class RandomForestClassifier(BaseRandomForest):
         np.ndarray
             Voted class predictions.
         """
-        return np.array([float(calc_mode(row)) for row in predictions])
+        return np.array([calc_mode(row) for row in predictions])
