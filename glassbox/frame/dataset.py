@@ -178,8 +178,8 @@ class Dataset:
 
         Parameters
         ----------
-        new_data: Dataset
-            New data to append
+        new_dataset : Dataset
+            New data to append.
 
         Returns
         -------

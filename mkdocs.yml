@@ -1,8 +1,47 @@
 site_name: GlassBox
-site_description: White-box AutoML library
+site_description: A transparent, white-box AutoML library built from scratch with NumPy.
 
 theme:
   name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - md_in_html
+  - toc:
+      permalink: true
 
 plugins:
   - search
@@ -10,6 +49,22 @@ plugins:
       handlers:
         python:
           paths: [.]
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            heading_level: 2
+            show_bases: true
+            show_docstring_parameters: true
+            show_docstring_returns: true
+            show_docstring_raises: true
+            merge_init_into_class: true
+            separate_signature: true
+            signature_crossrefs: true
   - gen-files:
       scripts:
         - docs/gen_ref_pages.py
@@ -19,4 +74,10 @@ plugins:
 
 nav:
   - Home: index.md
+  - Getting Started: getting-started.md
+  - User Guide:
+      - Frame: user-guide/frame.md
+      - Inspector: user-guide/inspector.md
+      - Cleaner: user-guide/cleaner.md
+      - Models: user-guide/models.md
   - API Reference: reference/
