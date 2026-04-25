@@ -1,5 +1,6 @@
 from ._base import BaseModel
 from .ensemble import RandomForestClassifier, RandomForestRegressor
+from .gaussian_nb import GaussianNB
 from .linear_model import (
     BaseLinearModel,
     LearningSchedule,
@@ -28,4 +29,5 @@ __all__ = [
     "BaseLinearModel",
     "LinearRegression",
     "LogisticRegression",
+    "GaussianNB",
 ]

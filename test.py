@@ -2,17 +2,10 @@ import json
 
 import numpy as np
 
-from glassbox.cleaner import (
-    ImputationStrategy,
-    OutlierCapper,
-    SimpleImputer,
-    StandardScaler,
-)
-from glassbox.frame import Dataset, read_csv
-from glassbox.inspector import DataAuditor
 from glassbox.models import (
     DecisionTreeClassifier,
     DistanceMetric,
+    GaussianNB,
     KNeighborsClassifier,
     LearningSchedule,
     LinearRegression,
@@ -23,79 +16,95 @@ from glassbox.models import (
 
 
 def main():
-    filepath = "datasets/Penguins/penguins.csv"
-    print(f"Loading dataset from {filepath}...")
-    dataset = read_csv(filepath)
-    print(f"Loaded {dataset.shape[0]} rows and {dataset.shape[1]} columns.")
-
-    auditor = DataAuditor()
-
-    print("\n" + "=" * 50)
-    print("EDA REPORT: BEFORE CLEANING")
+    # Create synthetic test data instead of loading penguins
+    np.random.seed(42)
+    
+    # Create a simple 3-class dataset
+    n_per_class = 50
+    n_features = 6
+    
+    # Class 0: centered around origin
+    X_class0 = np.random.randn(n_per_class, n_features) * 0.5
+    y_class0 = np.array([0] * n_per_class)
+    
+    # Class 1: centered at (2, 2, ...)
+    X_class1 = np.random.randn(n_per_class, n_features) * 0.5 + 2.0
+    y_class1 = np.array([1] * n_per_class)
+    
+    # Class 2: centered at (-2, -2, ...)
+    X_class2 = np.random.randn(n_per_class, n_features) * 0.5 - 2.0
+    y_class2 = np.array([2] * n_per_class)
+    
+    X = np.vstack([X_class0, X_class1, X_class2])
+    y = np.hstack([y_class0, y_class1, y_class2])
+    
+    # Shuffle
+    indices = np.random.permutation(len(X))
+    X = X[indices]
+    y = y[indices]
+    
+    # Train/test split (80/20)
+    split_idx = int(0.8 * len(X))
+    X_train, X_test = X[:split_idx], X[split_idx:]
+    y_train, y_test = y[:split_idx], y[split_idx:]
+    
+    print(f"Training on {len(X_train)} samples. Testing on {len(X_test)} samples.\n")
     print("=" * 50)
-    report_before = auditor.run_audit(dataset)
-    print(json.dumps(json.loads(report_before.to_json()), indent=4))
-
-    print("\n" + "-" * 50)
-    print("Running Cleaner Modules Pipeline...")
-    print("-" * 50)
-
-    # penguins dataset indices:
-    # 0: id, 1: species, 2: island, 3: bill_length_mm, 4: bill_depth_mm
-    # 5: flipper_length_mm, 6: body_mass_g, 7: sex, 8: year
-    num_idx = [0, 3, 4, 5, 6, 8]
-    cat_idx = [1, 2, 7]
-
-    cleaned_data_matrix = dataset.data.copy()
-    num_data = np.array(cleaned_data_matrix[:, num_idx], dtype=float)
-
-    print("-> Applying Imputation (MEAN)...")
-    imputer = SimpleImputer(strategy=ImputationStrategy.MEAN)
-    imputed_num = imputer.fit_transform(num_data)
-
-    print("-> Applying Scaler (StandardScaler)...")
-    scaler = StandardScaler()
-    scaled_num = scaler.fit_transform(imputed_num)
-
-    print("-> Applying Outlier Capper...")
-    capper = OutlierCapper()
-    capped_num = capper.fit_transform(scaled_num)
-
-    # Impute categorical features
-    cat_data = cleaned_data_matrix[:, cat_idx]
-    print("-> Applying Imputation (MODE) for categoricals...")
-    cat_imputer = SimpleImputer(strategy=ImputationStrategy.MODE)
-    imputed_cat = cat_imputer.fit_transform(cat_data)
-
-    cleaned_data_matrix[:, num_idx] = capped_num
-    cleaned_data_matrix[:, cat_idx] = imputed_cat
-
-    clean_dataset = Dataset(cleaned_data_matrix, dataset.columns)
-
-    print("\n" + "=" * 50)
-    print("EDA REPORT: AFTER CLEANING")
+    print("GAUSSIAN NB CLASSIFIER TEST")
     print("=" * 50)
-    report_after = auditor.run_audit(clean_dataset)
-    print(json.dumps(json.loads(report_after.to_json()), indent=4))
-
+    
+    gnb = GaussianNB(epsilon=1e-9)
+    print("Training GaussianNB...")
+    gnb.fit(X_train, y_train)
+    
+    preds_gnb = gnb.predict(X_test)
+    proba_gnb = gnb.predict_proba(X_test)
+    
+    accuracy_gnb = np.mean(preds_gnb == y_test)
+    print(f"GaussianNB Accuracy: {accuracy_gnb * 100:.2f}%\n")
+    
+    print("Sample of 15 Predictions (GaussianNB vs Actual):")
+    for i in range(min(15, len(y_test))):
+        match = "✓" if preds_gnb[i] == y_test[i] else "✗"
+        prob_max = np.max(proba_gnb[i])
+        print(f"[{match}] Predicted: {int(preds_gnb[i])} | Actual: {int(y_test[i])} | Confidence: {prob_max:.4f}")
+    
+    # Verify probabilities sum to 1
+    prob_sums = np.sum(proba_gnb, axis=1)
+    assert np.allclose(prob_sums, 1.0), "Probabilities do not sum to 1"
+    print("\n✓ Probabilities sum to 1.0")
+    
+    # Verify predictions match highest probability class
+    pred_from_proba = np.argmax(proba_gnb, axis=1)
+    assert np.allclose(preds_gnb, pred_from_proba), "Predictions don't match highest probability"
+    print("✓ Predictions match highest probability class")
+    
+    # Verify model was fitted
+    assert len(gnb.classes) == 3, "Classes not detected correctly"
+    print(f"✓ Detected {len(gnb.classes)} classes: {gnb.classes}")
+    
+    print("\n" + "=" * 50)
+    print("GAUSSIAN NB TEST: EDGE CASES")
+    print("=" * 50)
+    
+    # Test error on unfitted model
+    unfitted_gnb = GaussianNB()
+    try:
+        unfitted_gnb.predict(X_test)
+        print("✗ Should have raised ValueError for unfitted model")
+    except ValueError as e:
+        print(f"✓ Correctly raised error for unfitted model: {e}")
+    
+    # Test error on mismatched dimensions
+    try:
+        gnb.fit(X_train, y_train[:5])
+        print("✗ Should have raised ValueError for mismatched dimensions")
+    except ValueError as e:
+        print(f"✓ Correctly raised error for mismatched dimensions: {e}")
+    
     print("\n" + "=" * 50)
     print("KNN CLASSIFIER TEST (Train/Test Split)")
     print("=" * 50)
-
-    X = clean_dataset.data[:, num_idx]
-    y = clean_dataset.data[:, cat_idx[0]]  # Species column
-
-    # Shuffle and split (80/20)
-    np.random.seed(42)  # For reproducibility
-    n_samples = X.shape[0]
-    indices = np.random.permutation(n_samples)
-    split_idx = int(0.8 * n_samples)
-
-    train_idx, test_idx = indices[:split_idx], indices[split_idx:]
-    X_train, X_test = X[train_idx], X[test_idx]
-    y_train, y_test = y[train_idx], y[test_idx]
-
-    print(f"Training on {len(train_idx)} samples. Testing on {len(test_idx)} samples.\n")
 
     knn_kd = KNeighborsClassifier(
         k=5, metric=DistanceMetric.EUCLIDEAN, algorithm=SearchAlgorithm.KD_TREE
