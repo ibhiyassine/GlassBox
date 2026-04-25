@@ -80,4 +80,6 @@ nav:
       - Inspector: user-guide/inspector.md
       - Cleaner: user-guide/cleaner.md
       - Models: user-guide/models.md
+      - Metrics: user-guide/metrics.md
+      - Orchestrator: user-guide/orchestrator.md
   - API Reference: reference/

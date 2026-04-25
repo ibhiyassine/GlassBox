@@ -46,6 +46,23 @@ MODULE_DESCRIPTIONS = {
     "glassbox.models.neighbors.index._base": "Abstract `BaseIndex` interface for nearest-neighbor lookup.",
     "glassbox.models.neighbors.index._brute": "`BruteForceIndex` — exhaustive distance search.",
     "glassbox.models.neighbors.index._kdtree": "`KDTreeIndex` — space-partitioning tree for efficient nearest-neighbor queries.",
+    "glassbox.models.gaussian_nb": "Gaussian Naive Bayes models.",
+    "glassbox.models.gaussian_nb._base": "Abstract base class for GaussianNB.",
+    "glassbox.models.gaussian_nb.gaussian_nb": "`GaussianNB` classifier.",
+    "glassbox.models.linear_model": "Linear regression and classification models.",
+    "glassbox.models.linear_model._base": "Abstract `BaseLinearModel`.",
+    "glassbox.models.linear_model._enums": "`LearningSchedule` enum.",
+    "glassbox.models.linear_model.linear": "`LinearRegression` model.",
+    "glassbox.models.linear_model.logistic": "`LogisticRegression` model.",
+    "glassbox.metrics": "Evaluation metrics for classification and regression.",
+    "glassbox.metrics.classification": "Classification metrics (accuracy, precision, recall, f1_score).",
+    "glassbox.metrics.regression": "Regression metrics (MSE, MAE, R2).",
+    "glassbox.orchestrator": "Model selection and hyperparameter search tools.",
+    "glassbox.orchestrator.base_search": "Abstract `BaseSearch` for grid/randomized search.",
+    "glassbox.orchestrator.base_splitter": "Abstract `BaseSplitter` for cross-validation.",
+    "glassbox.orchestrator.grid_search": "`GridSearchCV` for exhaustive search.",
+    "glassbox.orchestrator.randomized_search": "`RandomizedSearchCV` for randomized search.",
+    "glassbox.orchestrator.splitters": "Cross-validation generators (`KFoldSplitter`, `StratifiedKFoldSplitter`).",
 }
 
 for path in sorted(src.rglob("*.py")):

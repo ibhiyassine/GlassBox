@@ -149,6 +149,59 @@ preds = model.predict(X_test)
 
 ---
 
+## Gaussian Naive Bayes
+
+A probabilistic classifier based on applying Bayes' theorem with strong (naive) independence assumptions between the features. Features are assumed to follow a Gaussian distribution.
+
+### GaussianNB
+
+```python
+from glassbox.models import GaussianNB
+
+model = GaussianNB()
+model.fit(X_train, y_train)
+preds = model.predict(X_test)
+```
+
+---
+
+## Linear Models
+
+Models that fit a linear surface to the data, trained using gradient descent optimization.
+
+### LinearRegression
+
+Predicts a continuous target variable by finding the line of best fit.
+
+```python
+from glassbox.models import LinearRegression
+
+model = LinearRegression(learning_rate=0.01, n_iterations=1000)
+model.fit(X_train, y_train)
+preds = model.predict(X_test)
+```
+
+### LogisticRegression
+
+Predicts a categorical target variable using the logistic (sigmoid) function to output probabilities.
+
+```python
+from glassbox.models import LogisticRegression
+
+model = LogisticRegression(learning_rate=0.1, n_iterations=1000)
+model.fit(X_train, y_train)
+preds = model.predict(X_test)
+```
+
+### Parameters
+
+| Parameter | Default | Description |
+|---|---|---|
+| `learning_rate` | `0.01` | The step size for gradient descent optimization. |
+| `n_iterations` | `1000` | The number of optimization iterations. |
+
+---
+
 ## API Reference
 
 ::: glassbox.models
@@ -164,3 +217,8 @@ preds = model.predict(X_test)
         - KNeighborsRegressor
         - DistanceMetric
         - SearchAlgorithm
+        - GaussianNB
+        - BaseLinearModel
+        - LinearRegression
+        - LogisticRegression
+        - LearningSchedule
