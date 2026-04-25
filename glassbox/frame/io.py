@@ -1,3 +1,4 @@
+import csv
 from typing import List
 
 import numpy as np
@@ -20,18 +21,20 @@ def read_csv(filepath: str) -> Dataset:
         Loaded dataset object.
     """
     with open(filepath, newline="", encoding="utf-8") as data_source:
-        entries = [entry.rstrip("\n") for entry in data_source if entry.strip()]
+        reader = csv.reader(data_source)
+        # Filter empty rows
+        entries = [row for row in reader if row]
 
     if not entries:
         raise ValueError(f"CSV file is empty: {filepath}")
 
     # Parse header
-    columns = [col.strip().strip('"') for col in entries[0].split(",")]
+    columns = [col.strip() for col in entries[0]]
 
     # Parse rows
     rows = []
-    for line in entries[1:]:
-        cells = [cell.strip().strip('"') for cell in line.split(",")]
+    for _row in entries[1:]:
+        cells = [cell.strip() for cell in _row]
         rows.append(cells)
 
     if not rows:
