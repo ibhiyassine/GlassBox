@@ -23,6 +23,12 @@ from glassbox.models import (
     RandomForestClassifier,
     SearchAlgorithm,
 )
+from glassbox.orchestrator import (
+    GridSearchCV,
+    KFoldSplitter,
+    RandomizedSearchCV,
+    StratifiedKFoldSplitter,
+)
 
 
 def main():
@@ -93,6 +99,55 @@ def main():
     assert len(gnb.classes) == 3, "Classes not detected correctly"
     print(f"✓ Detected {len(gnb.classes)} classes: {gnb.classes}")
     
+    print("\n" + "=" * 50)
+    print("ORCHESTRATOR TEST")
+    print("=" * 50)
+
+    kfold_splitter = KFoldSplitter(n_splits=3, shuffle=True)
+    stratified_splitter = StratifiedKFoldSplitter(n_splits=3, shuffle=True)
+
+    kfold_splits = list(kfold_splitter.split(X_train, y_train))
+    stratified_splits = list(stratified_splitter.split(X_train, y_train))
+
+    assert len(kfold_splits) == 3, "KFoldSplitter must generate 3 folds"
+    assert len(stratified_splits) == 3, "StratifiedKFoldSplitter must generate 3 folds"
+
+    assert sum(len(test_idx) for _, test_idx in kfold_splits) == len(X_train)
+    for _, test_idx in stratified_splits:
+        assert len(np.unique(y_train[test_idx])) == 3, "Each stratified fold must contain all classes"
+
+    print("✓ KFoldSplitter and StratifiedKFoldSplitter produced valid folds")
+
+    grid_search = GridSearchCV(
+        estimator=DecisionTreeClassifier(max_depth=1),
+        param_space={"max_depth": [1, 2, 3]},
+        cv_engine=kfold_splitter,
+        scoring_func=accuracy_score,
+    )
+    grid_search.fit(X_train, y_train)
+
+    assert grid_search.best_params_ in [
+        {"max_depth": 1},
+        {"max_depth": 2},
+        {"max_depth": 3},
+    ]
+    assert hasattr(grid_search.best_estimator_, "predict")
+    print(f"✓ GridSearchCV ran successfully and selected params: {grid_search.best_params_}")
+
+    randomized_search = RandomizedSearchCV(
+        estimator=DecisionTreeClassifier(max_depth=1),
+        param_space={"max_depth": [1, 2, 3]},
+        cv_engine=stratified_splitter,
+        scoring_func=accuracy_score,
+        n_iter=2,
+        time_budget=0.1,
+    )
+    randomized_search.fit(X_train, y_train)
+
+    assert randomized_search.best_score_ >= 0.0, "RandomizedSearchCV should produce a non-negative score"
+    assert randomized_search.best_params_ is not None
+    print(f"✓ RandomizedSearchCV ran successfully with best_score_={randomized_search.best_score_:.4f}")
+
     print("\n" + "=" * 50)
     print("GAUSSIAN NB TEST: EDGE CASES")
     print("=" * 50)
