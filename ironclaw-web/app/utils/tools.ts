@@ -47,23 +47,31 @@ export const cleanDataTool: FunctionDeclaration = {
         properties: {
             imputation_strategy: {
                 type: 'object' as any,
-                description:
-                    'Mapping of column names to imputation methods. Supported methods: "mean", "median", "mode", "constant".',
+                description: 'Mapping of column names to imputation methods.',
+                additionalProperties: {
+                    type: 'string' as any,
+                    enum: ['mean', 'median', 'mode', 'constant'],
+                },
             },
             outlier_handling: {
                 type: 'object' as any,
-                description:
-                    'Mapping of column names to outlier handling methods. Supported methods: "clip", "drop", "none".',
+                description: 'Mapping of column names to outlier handling methods.',
+                additionalProperties: {
+                    type: 'string' as any,
+                    enum: ['clip', 'drop', 'none'],
+                },
             },
             encoding_strategy: {
                 type: 'object' as any,
-                description:
-                    'Mapping of column names to encoding methods. Supported methods: "onehot", "label", "none".',
+                description: 'Mapping of column names to encoding methods.',
+                additionalProperties: {
+                    type: 'string' as any,
+                    enum: ['onehot', 'label', 'none'],
+                },
             },
             scale: {
                 type: 'string' as any,
-                description:
-                    'Global scaling method to apply. One of: "standard", "minmax", "none".',
+                description: 'Global scaling method to apply.',
                 enum: ['standard', 'minmax', 'none'],
             },
             columns_to_drop: {
@@ -72,13 +80,7 @@ export const cleanDataTool: FunctionDeclaration = {
                 description: 'List of column names to drop entirely from the dataset.',
             },
         },
-        required: [
-            'imputation_strategy',
-            'outlier_handling',
-            'encoding_strategy',
-            'scale',
-            'columns_to_drop',
-        ],
+        required: [],
     },
 }
 
@@ -97,8 +99,11 @@ export const trainAndTuneTool: FunctionDeclaration = {
             },
             models: {
                 type: 'object' as any,
-                description:
-                    'Dictionary mapping model class names to their hyperparameter search grid dictionaries. AVAILABLE MODELS ONLY: KNeighborsClassifier, KNeighborsRegressor, DecisionTreeClassifier, DecisionTreeRegressor, RandomForestClassifier, RandomForestRegressor, LinearRegression, LogisticRegression, GaussianNB. e.g. {"RandomForestClassifier": {"n_estimators": [10, 30]}}.',
+                description: 'Dictionary mapping model names to their hyperparameter search grids.',
+                additionalProperties: {
+                    type: 'object' as any,
+                    description: 'Hyperparameter search grid for the model.',
+                },
             },
             metric: {
                 type: 'string' as any,

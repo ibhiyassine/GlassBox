@@ -22,6 +22,15 @@
          <div class="flex flex-col flex-1 overflow-hidden relative">
             <header class="h-14 flex items-center justify-between px-6 border-b border-stone-100 flex-shrink-0">
                <div class="font-serif text-lg font-medium text-stone-800" style="font-family: 'Georgia', serif;">Interactive Data Analysis Chat</div>
+               <button 
+                 class="text-stone-400 p-2 hover:text-stone-600 hover:bg-stone-50 rounded-lg transition-colors border border-stone-200"
+                 title="Hard Refresh"
+                 @click="hardRefresh"
+               >
+                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                   <path d="M12 5v14M5 12h14" />
+                 </svg>
+               </button>
             </header>
 
             <div class="flex-1 overflow-y-auto px-6 py-8 custom-scrollbar scroll-smooth" ref="chatScroll">
@@ -90,6 +99,10 @@ const greeting = computed(() => {
   return 'Evening'
 })
 
+function hardRefresh() {
+  window.location.reload()
+}
+
 async function handleCsvUpload(payload: { filename: string; csvText: string }) {
   csvFilename.value = payload.filename
   csvLoaded.value = true
@@ -155,6 +168,18 @@ async function handleSend() {
           role: 'tool',
           text: `Calling **${tc.name}**:\n\`\`\`json\n${JSON.stringify(tc.args, null, 2)}\n\`\`\``,
         })
+
+        if (tc.error) {
+          // If the LLM sent malformed JSON, don't even try to call WASM.
+          // Send the error back to the LLM so it can retry.
+          const errorResponse = { status: 'error', message: tc.error }
+          messages.value.push({
+            role: 'tool',
+            text: `⚠️ **Parsing Error**: ${tc.error}`,
+          })
+          toolResults.push({ name: tc.name, response: errorResponse })
+          continue
+        }
 
         const result = await wasm.callTool(tc.name, tc.args)
 

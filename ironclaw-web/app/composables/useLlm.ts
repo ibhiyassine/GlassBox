@@ -20,6 +20,7 @@ export interface Content {
 export interface ToolCall {
     name: string
     args: Record<string, any>
+    error?: string | null
 }
 
 export interface LlmResponse {
@@ -37,7 +38,9 @@ export function useLlm() {
         'You help users inspect, clean, and train machine-learning models on their CSV data. ' +
         'Always call inspect_data first before cleaning or training. ' +
         'Explain your reasoning clearly after each step. ' +
-        'When you receive tool results, interpret them for the user in plain language with actionable insights.'
+        'When calling tools, ensure your JSON arguments are strictly valid. ' +
+        'CRITICAL: Avoid common formatting errors like unclosed quotes, extra braces (e.g. `{"key": "val"}`), or repeating keys. ' +
+        'The arguments must be a single, flat, valid JSON object corresponding to the tool schema.'
 
     function getApiKey() {
         const apiKey = config.public.openrouterApiKey as string
@@ -144,14 +147,17 @@ export function useLlm() {
             for (const tc of choice.message.tool_calls) {
                 if (tc.type === 'function') {
                     let args = {}
+                    let parseError: string | null = null
                     try {
                         args = JSON.parse(tc.function.arguments)
-                    } catch (e) {
+                    } catch (e: any) {
                         console.error('Failed to parse tool arguments:', tc.function.arguments, e)
+                        parseError = `Failed to parse tool arguments as JSON: ${e.message}. Please try again with valid JSON formatting.`
                     }
                     toolCalls.push({
                         name: tc.function.name,
-                        args
+                        args,
+                        error: parseError // Add an error field if parsing failed
                     })
                 }
             }
