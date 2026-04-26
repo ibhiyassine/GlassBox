@@ -1,0 +1,39 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - ironclaw-web
+      - main
+    paths:
+      - "ironclaw-web/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: ironclaw-web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ironclaw-web
+        run: npm ci
+
+      - name: Build Nuxt app
+        working-directory: ironclaw-web
+        run: npm run build # Or `npm run generate` if purely static
+
+      - name: Deploy to Netlify
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=ironclaw-web/.output/public --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
