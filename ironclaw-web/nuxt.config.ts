@@ -44,8 +44,6 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['~/assets/css/main.css'],
-
   vite: {
     optimizeDeps: {
       exclude: ['pyodide'],
