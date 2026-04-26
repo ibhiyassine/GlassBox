@@ -6,6 +6,9 @@ on:
       - main
       - ironclaw-web # Including current branch for testing
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
