@@ -51,6 +51,9 @@ export default defineNuxtConfig({
   },
 
   modules: ['@nuxtjs/tailwindcss'],
+  nitro: {
+    preset: 'netlify' // <-- Add this specific line
+  },
   tailwindcss: {
     configPath: '../tailwind.config.js',
     viewer: false,
