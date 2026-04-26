@@ -1,0 +1,9 @@
+[build]
+  base = "ironclaw-web"
+  command = "npm run build"
+  publish = ".output/public"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+  # Note: Since this is Nuxt, we don't actually need the Next.js plugin. 
+  # But we can add the Nuxt one if needed, though Nuxt 3 works out of the box with these paths.
