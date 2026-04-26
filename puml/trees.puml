@@ -1,0 +1,60 @@
+@startuml
+package "trees" {
+
+    class _Node {
+        + feature_index: Int
+        + threshold: Float
+        + left: _Node
+        + right: _Node
+        + value: Float
+        + is_leaf_node() : Boolean
+    }
+
+    class _SplitResult {
+        + feature_index: Int
+        + threshold: Float
+        + left_X: np.ndarray
+        + left_y: np.ndarray
+        + right_X: np.ndarray
+        + right_y: np.ndarray
+        + gain: Float
+    }
+
+    abstract class BaseTree <<abstract>> {
+        # max_depth: Int
+        # min_samples_split: Int
+        # root: _Node
+        
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        + predict(X: np.ndarray, **kwargs) : np.ndarray
+        
+        # _build_tree(X: np.ndarray, y: np.ndarray, depth: Int) : _Node
+        # _best_split(X: np.ndarray, y: np.ndarray) : _SplitResult
+        # _traverse_tree(x: np.ndarray, node: _Node) : Float
+        
+        ' *** The Renamed Abstract Method ***
+        # {abstract} _calculate_cost(y: np.ndarray) : Float
+        # {abstract} _create_leaf_value(y: np.ndarray) : Float
+    }
+
+    class DecisionTreeClassifier {
+        # _calculate_cost(y: np.ndarray) : Float
+        # _create_leaf_value(y: np.ndarray) : Float
+    }
+
+    class DecisionTreeRegressor {
+        # _calculate_cost(y: np.ndarray) : Float
+        # _create_leaf_value(y: np.ndarray) : Float
+    }
+
+    BaseTree *-- _Node 
+    BaseTree *-- _SplitResult
+    BaseTree <|-- DecisionTreeClassifier
+    BaseTree <|-- DecisionTreeRegressor
+
+    _Node -[hidden]right-> _SplitResult
+    _Node -[hidden]down-> BaseTree
+    BaseTree -[hidden]down-> DecisionTreeClassifier
+    DecisionTreeClassifier -[hidden]right-> DecisionTreeRegressor
+}
+@enduml

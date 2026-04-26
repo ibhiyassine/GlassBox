@@ -1,0 +1,47 @@
+@startuml
+package "linear_model" {
+
+    enum LearningSchedule {
+        CONSTANT
+        TIME_DECAY
+        EXPONENTIAL
+    }
+
+    ' The new Intermediate Class
+    abstract class BaseLinearModel <<abstract>> {
+        # learning_rate: Float
+        # max_epochs: Int
+        # tol: Float
+        # schedule: LearningSchedule
+        # weights: np.ndarray
+        # bias: Float
+        
+        + {abstract} fit(X: np.ndarray, y: np.ndarray) : Self
+        + {abstract} predict(X: np.ndarray, **kwargs) : np.ndarray
+        # _update_learning_rate(epoch: Int) : Float
+        - _calc_constant() : Float
+        - _calc_time_decay(epoch: Int) : Float
+        - _calc_exponential(epoch: Int) : Float
+    }
+
+    class LinearRegression {
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        + predict(X: np.ndarray, **kwargs) : np.ndarray
+    }
+    
+    class LogisticRegression {
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        + predict(X: np.ndarray, **kwargs) : np.ndarray
+        + predict_proba(X: np.ndarray) : np.ndarray
+        - _sigmoid(z: np.ndarray) : np.ndarray
+    }
+
+    ' Inheritance Mapping
+    LearningSchedule -[hidden]down-> BaseLinearModel
+    BaseLinearModel <|-- LinearRegression
+    BaseLinearModel <|-- LogisticRegression
+
+    ' Layout Hack
+    LinearRegression -[hidden]right-> LogisticRegression
+}
+@enduml

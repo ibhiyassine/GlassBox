@@ -1,0 +1,97 @@
+@startuml
+package "Inspector" {
+
+    ' === Top Level ===
+    class DataAuditor {
+        + run_audit(data: Dataset) : EDAReport
+    }
+
+    class EDAReport <<dataclass>> {
+        + feature_types: Dict
+        + missing_values: Dict
+        + outliers_info: Dict
+        + summary_stats: Dict
+        + collinearity_map: List
+        + to_json() : String
+    }
+
+    ' === Column 1: Worker Classes (Helpers Restored) ===
+    class AutoTyper {
+        + infer_types(data) : Dict
+        - _is_boolean(col) : Boolean
+        - _is_numeric(col) : Boolean
+    }
+    
+    class StatProfiler {
+        + calculate_stats(data, cols) : Dict
+        - _calc_mean(col) : Float
+        - _calc_median(col) : Float
+        - _calc_mode(col) : Float | String
+        - _calc_std(col) : Float
+        - _calc_skew(col) : Float
+        - _calc_kurtosis(col) : Float
+    }
+    
+    class OutlierDetector {
+        + flag_outliers(data, cols) : Dict
+        - _calc_iqr(col) : Tuple
+    }
+    
+    class AssociationAnalyzer {
+        + build_correlation(data, cols) : List
+        - _calc_pearson(col_x, col_y) : Float
+    }
+
+    ' === Column 2: Data Structures ===
+    class FeatureStats <<dataclass>> {
+        + mean: Float
+        + median: Float
+        + mode: Float | String
+        + std: Float
+        + skew: Float
+        + kurt: Float
+    }
+    
+    class OutlierInfo <<dataclass>> {
+        + count: Int
+        + lower_bound: Float
+        + upper_bound: Float
+    }
+    
+    class CollinearityPair <<dataclass>> {
+        + feature_a: String
+        + feature_b: String
+        + score: Float
+    }
+    
+    enum FeatureType {
+        NUMERICAL
+        NOMINAL
+        ORDINAL
+        BOOLEAN
+    }
+
+    ' === LAYOUT HACKS (Forces vertical stacking) ===
+    DataAuditor -[hidden]down-> AutoTyper
+    AutoTyper -[hidden]down-> StatProfiler
+    StatProfiler -[hidden]down-> OutlierDetector
+    OutlierDetector -[hidden]down-> AssociationAnalyzer
+
+    EDAReport -[hidden]down-> FeatureStats
+    FeatureStats -[hidden]down-> OutlierInfo
+    OutlierInfo -[hidden]down-> CollinearityPair
+    CollinearityPair -[hidden]down-> FeatureType
+
+    ' === Actual Dependencies ===
+    DataAuditor .right.> EDAReport : <<creates>>
+    
+    DataAuditor ..> AutoTyper
+    DataAuditor ..> StatProfiler
+    DataAuditor ..> OutlierDetector
+    DataAuditor ..> AssociationAnalyzer
+    
+    EDAReport *-- FeatureStats
+    EDAReport *-- OutlierInfo
+    EDAReport *-- CollinearityPair
+}
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor transparent
+skinparam componentStyle rectangle
+
+package "Browser / Pyodide" {
+    [Agentic LLM] as Agent
+    
+    node "IronClaw Module" {
+        [API Layer] as API
+        [State Manager] as State
+    }
+    
+    package "GlassBox Core" {
+        [Inspector]
+        [Cleaner]
+        [Orchestrator]
+    }
+}
+
+database "Memory" {
+    [Dataset Object] as DS
+}
+
+Agent -> API : Tool Call (JSON)
+API -> State : verify_dataset()
+State -> DS : Retrieve
+API -> GlassBox : Execute Logic
+GlassBox -> DS : Mutate / Analyze
+API -> Agent : Response (JSON)
+@enduml

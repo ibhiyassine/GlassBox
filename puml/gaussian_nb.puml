@@ -1,0 +1,23 @@
+@startuml
+package "probability" {
+
+    class GaussianNB {
+        ' Hyperparameter
+        - epsilon: Float
+        
+        ' Parameters (Learned during fit)
+        - classes: np.ndarray
+        - class_priors: Dict
+        - class_means: Dict
+        - class_variances: Dict
+        
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        + predict(X: np.ndarray, **kwargs) : np.ndarray
+        + predict_proba(X: np.ndarray) : np.ndarray
+        
+        ' The Bell Curve Math
+        - _calculate_pdf(class_idx: Int, x: np.ndarray) : np.ndarray
+    }
+
+}
+@enduml
