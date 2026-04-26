@@ -6,6 +6,10 @@ The `glassbox.models` module provides machine learning algorithms for **classifi
 
 ## Model API
 
+```kroki-plantuml
+@from_file:puml/base_model.puml
+```
+
 ```python
 model.fit(X, y)       # Train on (n_samples, n_features) array
 model.predict(X)      # Returns predictions array
@@ -14,6 +18,10 @@ model.predict(X)      # Returns predictions array
 ---
 
 ## Decision Trees
+
+```kroki-plantuml
+@from_file:puml/trees.puml
+```
 
 CART-style decision trees that recursively split features to minimize a cost function.
 
@@ -52,6 +60,10 @@ preds = model.predict(X_test)
 
 ## Random Forests
 
+```kroki-plantuml
+@from_file:puml/ensemble.puml
+```
+
 Ensemble of decision trees trained on bootstrapped samples with random feature subsets (√n_features).
 
 ### RandomForestClassifier
@@ -89,6 +101,10 @@ preds = model.predict(X_test)
 ---
 
 ## K-Nearest Neighbors
+
+```kroki-plantuml
+@from_file:puml/neighbors.puml
+```
 
 Instance-based learning that predicts based on the `k` closest training samples.
 
@@ -151,6 +167,10 @@ preds = model.predict(X_test)
 
 ## Gaussian Naive Bayes
 
+```kroki-plantuml
+@from_file:puml/gaussian_nb.puml
+```
+
 A probabilistic classifier based on applying Bayes' theorem with strong (naive) independence assumptions between the features. Features are assumed to follow a Gaussian distribution.
 
 ### GaussianNB
@@ -166,6 +186,10 @@ preds = model.predict(X_test)
 ---
 
 ## Linear Models
+
+```kroki-plantuml
+@from_file:puml/linear.puml
+```
 
 Models that fit a linear surface to the data, trained using gradient descent optimization.
 

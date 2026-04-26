@@ -63,6 +63,9 @@ MODULE_DESCRIPTIONS = {
     "glassbox.orchestrator.grid_search": "`GridSearchCV` for exhaustive search.",
     "glassbox.orchestrator.randomized_search": "`RandomizedSearchCV` for randomized search.",
     "glassbox.orchestrator.splitters": "Cross-validation generators (`KFoldSplitter`, `StratifiedKFoldSplitter`).",
+    "glassbox.ironclaw": "Agentic API layer for WASM-based AutoML workflows.",
+    "glassbox.ironclaw.api": "High-level API functions for data inspection, cleaning, and model training.",
+    "glassbox.ironclaw.state": "In-memory state management for stateless WASM environments.",
 }
 
 for path in sorted(src.rglob("*.py")):

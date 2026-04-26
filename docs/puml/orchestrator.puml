@@ -1,0 +1,60 @@
+@startuml
+package "orchestrator" {
+
+    ' === Validation Engine (The Splitters) ===
+    abstract class BaseSplitter <<abstract>> {
+        # n_splits: Int
+        # shuffle: Boolean
+        
+        + {abstract} split(X: np.ndarray, y: np.ndarray) : Generator[Tuple, None, None]
+    }
+
+    class KFoldSplitter {
+        + split(X: np.ndarray, y: np.ndarray) : Generator[Tuple, None, None]
+    }
+
+    class StratifiedKFoldSplitter {
+        + split(X: np.ndarray, y: np.ndarray) : Generator[Tuple, None, None]
+    }
+
+    ' === Search Strategies (The Generators) ===
+    abstract class BaseSearch <<abstract>> {
+        # estimator: BaseModel
+        # param_space: Dict
+        # cv_engine: BaseSplitter
+        # scoring_func: Callable
+        
+        # best_params_: Dict
+        # best_score_: Float
+        # best_estimator_: BaseModel
+        
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        # {abstract} _generate_candidates() : Generator[Dict, None, None]
+    }
+
+    class GridSearchCV {
+        # _generate_candidates() : Generator[Dict, None, None]
+    }
+
+    class RandomizedSearchCV {
+        - n_iter: Int
+        - time_budget: Float
+        
+        # _generate_candidates() : Generator[Dict, None, None]
+    }
+
+    ' === Relationships ===
+    
+    ' Splitter Inheritance
+    BaseSplitter <|-- KFoldSplitter
+    BaseSplitter <|-- StratifiedKFoldSplitter
+
+    ' Search Inheritance
+    BaseSearch <|-- GridSearchCV
+    BaseSearch <|-- RandomizedSearchCV
+
+    ' Search uses Splitter (Aggregation)
+    BaseSearch o-- BaseSplitter : "uses for validation"
+
+}
+@enduml

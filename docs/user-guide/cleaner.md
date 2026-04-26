@@ -6,6 +6,10 @@ The `glassbox.cleaner` module provides scikit-learn-style transformers for data 
 
 ## Transformer API
 
+```kroki-plantuml
+@from_file:puml/cleaner.puml
+```
+
 All transformers share the same interface:
 
 ```python

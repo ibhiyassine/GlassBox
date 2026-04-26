@@ -1,0 +1,37 @@
+@startuml
+package "ensemble" {
+
+    abstract class BaseRandomForest <<abstract>> {
+        # n_estimators: Int
+        # max_depth: Int
+        # min_samples_split: Int
+        # trees: List[BaseTree]
+        
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        + predict(X: np.ndarray, **kwargs) : np.ndarray
+        
+        # _bootstrap_sample(X: np.ndarray, y: np.ndarray) : Tuple
+        # _get_feature_subset(n_features: Int) : np.ndarray
+        
+        # {abstract} _create_tree() : BaseTree 
+        # {abstract} _aggregate(predictions: np.ndarray) : np.ndarray
+    }
+
+    class RandomForestClassifier {
+        - trees: List[DecisionTreeClassifier]
+        # _create_tree() : DecisionTreeClassifier
+        # _aggregate(predictions: np.ndarray) : np.ndarray 
+    }
+
+    class RandomForestRegressor {
+        - trees: List[DecisionTreeRegressor]
+        # _create_tree() : DecisionTreeRegressor
+        # _aggregate(predictions: np.ndarray) : np.ndarray 
+    }
+
+    BaseRandomForest <|-- RandomForestClassifier
+    BaseRandomForest <|-- RandomForestRegressor
+
+    RandomForestClassifier -[hidden]right-> RandomForestRegressor
+}
+@enduml

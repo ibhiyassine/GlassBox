@@ -26,6 +26,7 @@ dev = [
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
     "mkdocs-section-index",
+    "mkdocs-kroki-plugin",
 ]
 
 [tool.setuptools.packages.find]

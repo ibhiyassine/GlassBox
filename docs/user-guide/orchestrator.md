@@ -2,6 +2,10 @@
 
 The `glassbox.orchestrator` module provides tools for **model selection** and **hyperparameter tuning** through cross-validation.
 
+```kroki-plantuml
+@from_file:puml/orchestrator.puml
+```
+
 ---
 
 ## Hyperparameter Search

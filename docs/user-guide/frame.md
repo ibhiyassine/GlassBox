@@ -25,6 +25,10 @@ print(ds)
 
 ## The Dataset Class
 
+```kroki-plantuml
+@from_file:puml/frame.puml
+```
+
 `Dataset` wraps a 2-D NumPy array with named columns.
 
 ### Properties

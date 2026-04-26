@@ -1,0 +1,18 @@
+@startuml
+package "metrics" {
+
+    class Classification <<module>> {
+        + accuracy_score(y_true: np.ndarray, y_pred: np.ndarray) : float
+        + precision_score(y_true: np.ndarray, y_pred: np.ndarray) : float
+        + recall_score(y_true: np.ndarray, y_pred: np.ndarray) : float
+        + f1_score(y_true: np.ndarray, y_pred: np.ndarray) : float
+        + confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray) : np.ndarray
+    }
+
+    class Regression <<module>> {
+        + mean_absolute_error(y_true: np.ndarray, y_pred: np.ndarray) : float
+        + mean_squared_error(y_true: np.ndarray, y_pred: np.ndarray) : float
+        + r2_score(y_true: np.ndarray, y_pred: np.ndarray) : float
+    }
+}
+@enduml

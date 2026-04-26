@@ -1,0 +1,10 @@
+@startuml
+package "Models" {
+
+    abstract class BaseModel <<abstract>> {
+        + {abstract} fit(X: np.ndarray, y: np.ndarray) : Self
+        + {abstract} predict(X: np.ndarray, **kwargs) : np.ndarray
+    }
+
+}
+@enduml

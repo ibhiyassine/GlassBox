@@ -1,0 +1,80 @@
+@startuml
+    ' === Enums ===
+    enum ImputationStrategy {
+        MEAN
+        MEDIAN
+        MODE
+        CONSTANT
+    }
+
+    ' === The Core Interface ===
+    abstract class BaseTransformer <<abstract>> {
+        + {abstract} fit(X: np.ndarray) : Self
+        + {abstract} transform(X: np.ndarray) : np.ndarray
+        
+        ' Concrete method inherited by all subclasses
+        + fit_transform(X: np.ndarray) : np.ndarray
+    }
+
+    ' === Missing Values & Outliers ===
+    class SimpleImputer {
+        - strategy: ImputationStrategy
+        - _fill_values: Dict[String, Float | String]
+        + fit(X: np.ndarray) : Self
+        + transform(X: np.ndarray) : np.ndarray
+    }
+    
+    class OutlierCapper {
+        - bounds: Dict[String, Dict[String, Float]]
+        + fit(X: np.ndarray) : Self
+        + transform(X: np.ndarray) : np.ndarray
+    }
+
+    ' === Scalers (Numerical) ===
+    class StandardScaler {
+        - mean: np.ndarray
+        - std: np.ndarray
+        + fit(X: np.ndarray) : Self
+        + transform(X: np.ndarray) : np.ndarray
+    }
+
+    class MinMaxScaler {
+        - min: np.ndarray
+        - max: np.ndarray
+        + fit(X: np.ndarray) : Self
+        + transform(X: np.ndarray) : np.ndarray
+    }
+
+    ' === Encoders (Categorical) ===
+    class OneHotEncoder {
+        - categories: Dict[Int, List[String]]
+        + fit(X: np.ndarray) : Self
+        + transform(X: np.ndarray) : np.ndarray
+    }
+
+    class LabelEncoder {
+        - mapping: Dict[String, Int]
+        + fit(X: np.ndarray) : Self
+        + transform(X: np.ndarray) : np.ndarray
+    }
+
+    ' === Inheritance Relationships ===
+    BaseTransformer <|-- SimpleImputer
+    BaseTransformer <|-- OutlierCapper
+    BaseTransformer <|-- StandardScaler
+    BaseTransformer <|-- MinMaxScaler
+    BaseTransformer <|-- OneHotEncoder
+    BaseTransformer <|-- LabelEncoder
+    
+    SimpleImputer .right.> ImputationStrategy : <<uses>>
+
+    ' === Layout Hacks for compact diagram ===
+    BaseTransformer -[hidden]down-> SimpleImputer
+    SimpleImputer -[hidden]down-> OutlierCapper
+    
+    OutlierCapper -[hidden]right-> StandardScaler
+    StandardScaler -[hidden]down-> MinMaxScaler
+    
+    MinMaxScaler -[hidden]right-> OneHotEncoder
+    OneHotEncoder -[hidden]down-> LabelEncoder
+@enduml

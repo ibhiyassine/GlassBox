@@ -2,6 +2,10 @@
 
 The `glassbox.metrics` module provides functions to evaluate the performance of **classification** and **regression** models. All functions take true labels (`y_true`) and predicted labels (`y_pred`) as inputs.
 
+```kroki-plantuml
+@from_file:puml/metrics.puml
+```
+
 ---
 
 ## Classification Metrics

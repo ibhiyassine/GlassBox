@@ -1,0 +1,87 @@
+@startuml
+package "neighbors" {
+
+    enum DistanceMetric {
+        EUCLIDEAN
+        MANHATTAN
+    }
+
+    enum SearchAlgorithm {
+        BRUTE_FORCE
+        KD_TREE
+        HNSW
+    }
+
+    ' === The Strategy Pattern for Indexing ===
+    abstract class BaseIndex <<abstract>> {
+        # metric: DistanceMetric
+        + {abstract} build(X: np.ndarray) : void
+        + {abstract} query(x: np.ndarray, k: Int) : np.ndarray
+    }
+
+    class BruteForceIndex {
+        - X_train: np.ndarray
+        + build(X: np.ndarray) : void
+        + query(x: np.ndarray, k: Int) : np.ndarray
+    }
+
+    class KDTreeIndex {
+        - root: KDNode
+        - leaf_size: Int
+        + build(X: np.ndarray) : void
+        + query(x: np.ndarray, k: Int) : np.ndarray
+        - _build_tree(X: np.ndarray, depth: Int) : KDNode
+    }
+
+    class HNSWIndex {
+        ' Core HNSW structural parameters mapped from the original papers
+        - m: Int 
+        - ef_construction: Int
+        - m_max: Int
+        - graph_layers: Dict
+        - entry_point: Int
+        
+        + build(X: np.ndarray) : void
+        + query(x: np.ndarray, k: Int) : np.ndarray
+        - _insert(x: np.ndarray, internal_id: Int) : void
+        - _search_layer(q: np.ndarray, ep: Int, ef: Int, lc: Int) : List
+    }
+
+    ' === The ML Estimators ===
+    abstract class BaseKNN <<abstract>> {
+        # k: Int
+        # metric: DistanceMetric
+        # algorithm: SearchAlgorithm
+        # index: BaseIndex
+        # y_train: np.ndarray
+        
+        + fit(X: np.ndarray, y: np.ndarray) : Self
+        + predict(X: np.ndarray, **kwargs) : np.ndarray
+        
+        # {abstract} _aggregate(nearest_y: np.ndarray) : np.ndarray
+    }
+
+    class KNeighborsClassifier {
+        # _aggregate(nearest_y: np.ndarray) : np.ndarray
+    }
+
+    class KNeighborsRegressor {
+        # _aggregate(nearest_y: np.ndarray) : np.ndarray
+    }
+
+    ' === Relationships ===
+    BaseIndex <|-- BruteForceIndex
+    BaseIndex <|-- KDTreeIndex
+    BaseIndex <|-- HNSWIndex
+
+    BaseKNN *-- BaseIndex : "creates & delegates to"
+    BaseKNN <|-- KNeighborsClassifier
+    BaseKNN <|-- KNeighborsRegressor
+
+    ' === Layout Formatting ===
+    SearchAlgorithm -[hidden]down-> BaseIndex
+    DistanceMetric -[hidden]down-> SearchAlgorithm
+    BruteForceIndex -[hidden]right-> KDTreeIndex
+    KDTreeIndex -[hidden]right-> HNSWIndex
+}
+@enduml

@@ -71,6 +71,7 @@ plugins:
   - literate-nav:
       nav_file: SUMMARY.md
   - section-index
+  - kroki
 
 nav:
   - Home: index.md
@@ -82,4 +83,5 @@ nav:
       - Models: user-guide/models.md
       - Metrics: user-guide/metrics.md
       - Orchestrator: user-guide/orchestrator.md
+      - IronClaw: user-guide/ironclaw.md
   - API Reference: reference/

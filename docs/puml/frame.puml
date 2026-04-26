@@ -1,0 +1,37 @@
+@startuml
+' --- Styling to match native Draw.io UML shapes ---
+skinparam shadow false
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+    FontColor Black
+    FontSize 14
+    HeaderBackgroundColor White
+}
+' This is the magic command that changes colored circles back to + and -
+skinparam classAttributeIconSize 0 
+' --------------------------------------------------
+
+class Dataset {
+    - data: np.ndarray
+    - columns: List[String]
+    + shape: Tuple
+    --
+    - get_col_index(name: String) : Int
+    + get_columns(names: String | List[String]) : np.ndarray
+    + get_rows(indices: np.ndarray) : Dataset
+    
+    + update_column(name: String, new_data: np.ndarray)
+    + drop_columns(names: String | List[String])
+    + add_columns(names: String | List[String], data: np.ndarray)
+}
+
+class DataIO {
+    + read_csv(filepath: String) : Dataset
+    + to_csv(data: Dataset, columns: List[String], filepath: String) : None
+}
+
+DataIO ..> Dataset : <<creates>>
+
+@enduml

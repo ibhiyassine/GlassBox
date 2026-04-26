@@ -2,6 +2,10 @@
 
 The `glassbox.inspector` module performs a **non-destructive audit** of raw data, producing a comprehensive `EDAReport` with feature typing, statistics, outlier detection, and association analysis.
 
+```kroki-plantuml
+@from_file:puml/inspector.puml
+```
+
 ---
 
 ## Running a Full Audit
