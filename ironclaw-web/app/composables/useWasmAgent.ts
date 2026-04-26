@@ -103,11 +103,14 @@ type ToolArgs = Record<string, any>
 async function callTool(name: string, args: ToolArgs): Promise<string> {
     if (!pyodide.value) throw new Error('Pyodide not initialised')
 
-    pushLog(`🔧 Calling tool: ${name}`)
+    // Sanitize tool name (strip optional model tokens like <|channel|>)
+    const cleanName = name.split('<')[0].trim()
+    pushLog(`🔧 Calling tool: ${cleanName} (raw: ${name})`)
 
     let pythonCode: string
 
-    switch (name) {
+
+    switch (cleanName) {
         case 'inspect_data': {
             // Accept either 'csv_filename' or 'filename' argument
             const filename = args.csv_filename ?? args.filename;
@@ -119,24 +122,25 @@ async function callTool(name: string, args: ToolArgs): Promise<string> {
 
         case 'clean_data':
             pythonCode = `clean_data_api(
-    imputation_strategy=${JSON.stringify(args.imputation_strategy)},
-    outlier_handling=${JSON.stringify(args.outlier_handling)},
-    encoding_strategy=${JSON.stringify(args.encoding_strategy)},
-    scale=${JSON.stringify(args.scale)}
+    imputation_strategy=_json.loads(${JSON.stringify(JSON.stringify(args.imputation_strategy ?? {}))}),
+    outlier_handling=_json.loads(${JSON.stringify(JSON.stringify(args.outlier_handling ?? {}))}),
+    encoding_strategy=_json.loads(${JSON.stringify(JSON.stringify(args.encoding_strategy ?? {}))}),
+    scale=${JSON.stringify(args.scale ?? 'none')},
+    columns_to_drop=_json.loads(${JSON.stringify(JSON.stringify(args.columns_to_drop ?? []))})
 )`
             break
 
         case 'train_and_tune':
             pythonCode = `train_and_tune_api(
     target_column=${JSON.stringify(args.target_column)},
-    models=${JSON.stringify(args.models)},
+    models=_json.loads(${JSON.stringify(JSON.stringify(args.models ?? {}))}),
     metric=${JSON.stringify(args.metric)},
     metric_direction=${JSON.stringify(args.metric_direction)}
 )`
             break
 
         default:
-            throw new Error(`Unknown tool: ${name}`)
+            throw new Error(`Unknown tool: ${cleanName}`)
     }
 
     const wrappedCode = `

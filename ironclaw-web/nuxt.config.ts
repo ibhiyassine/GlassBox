@@ -6,8 +6,8 @@ export default defineNuxtConfig({
   // Expose .env vars to client-side code
   runtimeConfig: {
     public: {
-      geminiApiKey: '',
-      geminiModel: 'gemini-2.5-flash',
+      openrouterApiKey: '',
+      openrouterModel: 'google/gemini-1.5-flash',
     },
   },
 
@@ -48,4 +48,6 @@ export default defineNuxtConfig({
       exclude: ['pyodide'],
     },
   },
+
+  modules: ['@nuxtjs/tailwindcss'],
 })

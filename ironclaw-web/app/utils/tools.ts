@@ -5,7 +5,15 @@
  * and is formatted for the Gemini `functionDeclarations` spec.
  */
 
-import type { FunctionDeclaration } from '@google/genai'
+export interface FunctionDeclaration {
+    name: string
+    description: string
+    parameters?: {
+        type: 'object'
+        properties: Record<string, any>
+        required?: string[]
+    }
+}
 
 /* ──────────────────────────── Inspect ──────────────────────────── */
 export const inspectDataTool: FunctionDeclaration = {
@@ -56,6 +64,12 @@ export const cleanDataTool: FunctionDeclaration = {
                 type: 'string' as any,
                 description:
                     'Global scaling method to apply. One of: "standard", "minmax", "none".',
+                enum: ['standard', 'minmax', 'none'],
+            },
+            columns_to_drop: {
+                type: 'array' as any,
+                items: { type: 'string' as any },
+                description: 'List of column names to drop entirely from the dataset.',
             },
         },
         required: [
@@ -63,6 +77,7 @@ export const cleanDataTool: FunctionDeclaration = {
             'outlier_handling',
             'encoding_strategy',
             'scale',
+            'columns_to_drop',
         ],
     },
 }
@@ -81,19 +96,20 @@ export const trainAndTuneTool: FunctionDeclaration = {
                 description: 'Name of the column to predict.',
             },
             models: {
-                type: 'array' as any,
-                items: { type: 'string' as any },
+                type: 'object' as any,
                 description:
-                    'List of model identifiers to train. Supported: "knn", "decision_tree", "random_forest".',
+                    'Dictionary mapping model class names to their hyperparameter search grid dictionaries. AVAILABLE MODELS ONLY: KNeighborsClassifier, KNeighborsRegressor, DecisionTreeClassifier, DecisionTreeRegressor, RandomForestClassifier, RandomForestRegressor, LinearRegression, LogisticRegression, GaussianNB. e.g. {"RandomForestClassifier": {"n_estimators": [10, 30]}}.',
             },
             metric: {
                 type: 'string' as any,
                 description:
-                    'Evaluation metric. Supported: "accuracy", "f1", "precision", "recall", "mse", "r2".',
+                    'Evaluation metric. AVAILABLE METRICS ONLY: accuracy, precision, recall, f1, mean_absolute_error, mean_squared_error, r2.',
+                enum: ['accuracy', 'precision', 'recall', 'f1', 'mean_absolute_error', 'mean_squared_error', 'r2'],
             },
             metric_direction: {
                 type: 'string' as any,
                 description: '"maximize" or "minimize".',
+                enum: ['maximize', 'minimize'],
             },
         },
         required: ['target_column', 'models', 'metric', 'metric_direction'],

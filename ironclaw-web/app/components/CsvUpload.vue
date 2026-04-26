@@ -1,7 +1,11 @@
 <template>
   <div
-    class="csv-upload"
-    :class="{ 'csv-upload--active': isDragOver, 'csv-upload--loaded': !!file }"
+    class="relative border-2 border-dashed rounded-xl transition-all duration-300 cursor-pointer overflow-hidden group"
+    :class="{ 
+      'border-[#D97757] bg-[#fdfcf9]': isDragOver && !file, 
+      'border-stone-200 bg-stone-50 hover:border-stone-300 hover:bg-stone-100': !isDragOver && !file,
+      'border-stone-200 bg-white border-solid cursor-default shadow-sm': !!file 
+    }"
     @dragover.prevent="isDragOver = true"
     @dragleave.prevent="isDragOver = false"
     @drop.prevent="handleDrop"
@@ -10,14 +14,14 @@
       ref="fileInput"
       type="file"
       accept=".csv"
-      class="csv-upload__input"
+      class="hidden"
       @change="handleFileSelect"
     />
 
     <!-- Empty state -->
-    <div v-if="!file" class="csv-upload__prompt" @click="($refs.fileInput as HTMLInputElement).click()">
-      <div class="csv-upload__icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <div v-if="!file" class="flex flex-col items-center gap-2 py-10 px-6" @click="($refs.fileInput as HTMLInputElement).click()">
+      <div class="text-stone-400 mb-1 transition-colors duration-200 group-hover:text-stone-500">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
           <line x1="12" y1="18" x2="12" y2="12" />
@@ -25,27 +29,27 @@
           <line x1="15" y1="15" x2="12" y2="12" />
         </svg>
       </div>
-      <p class="csv-upload__title">Drop your CSV file here</p>
-      <p class="csv-upload__subtitle">or click to browse</p>
+      <p class="font-medium text-stone-700 text-sm">Drop your CSV file here</p>
+      <p class="text-xs text-stone-500">or click to browse</p>
     </div>
 
     <!-- Loaded state -->
-    <div v-else class="csv-upload__loaded animate-in">
-      <div class="csv-upload__file-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="1.5">
+    <div v-else class="flex items-center gap-4 py-4 px-5 animate-in fade-in duration-300">
+      <div class="flex-shrink-0 text-[#22c55e]">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
-          <polyline points="9 15 12 18 15 15" stroke="var(--success)" />
+          <polyline points="9 15 12 18 15 15" />
         </svg>
       </div>
-      <div class="csv-upload__meta">
-        <p class="csv-upload__filename">{{ file.name }}</p>
-        <p class="csv-upload__size">
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-stone-800 text-[14px] truncate">{{ file.name }}</p>
+        <p class="text-[12px] text-stone-500 font-mono mt-0.5">
           {{ formatSize(file.size) }}
           <span v-if="rowCount"> · {{ rowCount.toLocaleString() }} rows</span>
         </p>
       </div>
-      <button class="btn btn-ghost csv-upload__remove" @click.stop="removeFile">
+      <button class="p-1.5 rounded-md text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-200" @click.stop="removeFile">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
         </svg>
@@ -103,93 +107,3 @@ function removeFile() {
   emit('remove')
 }
 </script>
-
-<style scoped>
-.csv-upload {
-  position: relative;
-  border: 2px dashed var(--border-subtle);
-  border-radius: var(--radius-md);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.csv-upload:hover,
-.csv-upload--active {
-  border-color: var(--accent-primary);
-  background: var(--accent-glow);
-}
-
-.csv-upload--loaded {
-  border-style: solid;
-  border-color: var(--success);
-  background: var(--success-glow);
-  cursor: default;
-}
-
-.csv-upload__input {
-  display: none;
-}
-
-.csv-upload__prompt {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 40px 24px;
-}
-
-.csv-upload__icon {
-  color: var(--text-muted);
-  margin-bottom: 4px;
-  transition: color 0.2s;
-}
-.csv-upload:hover .csv-upload__icon {
-  color: var(--accent-secondary);
-}
-
-.csv-upload__title {
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-}
-
-.csv-upload__subtitle {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.csv-upload__loaded {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
-}
-
-.csv-upload__file-icon {
-  flex-shrink: 0;
-}
-
-.csv-upload__meta {
-  flex: 1;
-  min-width: 0;
-}
-
-.csv-upload__filename {
-  font-weight: 600;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.csv-upload__size {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-}
-
-.csv-upload__remove {
-  padding: 6px;
-  flex-shrink: 0;
-}
-</style>
