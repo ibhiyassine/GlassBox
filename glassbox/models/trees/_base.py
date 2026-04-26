@@ -93,7 +93,7 @@ class BaseTree(BaseModel):
         min_samples_split : int, default=2
             Minimum number of samples required to split an internal node.
         """
-        self.max_depth = max_depth
+        self.max_depth = max_depth if max_depth is not None else float("inf")
         self.min_samples_split = min_samples_split
         self.root: Optional[_Node] = None
 

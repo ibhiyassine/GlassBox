@@ -40,7 +40,7 @@ class LogisticRegression(BaseLinearModel):
 
         classes = np.unique(y_arr)
         if not np.all(np.isin(classes, np.array([0, 1]))):
-            raise ValueError("y must contain binary labels encoded as 0 and 1")
+            raise ValueError(f"y must contain binary labels encoded as 0 and 1, but found: {classes.tolist()}")
 
         y_bin = y_arr.astype(float)
 

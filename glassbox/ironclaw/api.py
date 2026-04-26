@@ -1,6 +1,8 @@
 import json
 from typing import Dict, Any, List
 
+import numpy as np
+
 from glassbox.frame import read_csv
 from glassbox.inspector import DataAuditor
 from glassbox.ironclaw.state import memory
@@ -33,13 +35,20 @@ def clean_data_api(
     imputation_strategy: Dict[str, str],
     outlier_handling: Dict[str, str],
     encoding_strategy: Dict[str, str],
-    scale: str
+    scale: str,
+    columns_to_drop: List[str] = None
 ) -> str:
     """
     Safely mutates the data applying exactly the logic requested by the LLM schemas.
     """
     try:
+        if columns_to_drop is None:
+            columns_to_drop = []
+            
         dataset = memory.verify_dataset()
+        
+        if columns_to_drop:
+            dataset.drop_columns(columns_to_drop)
         
         import numpy as np
         from glassbox.cleaner import (
@@ -124,7 +133,8 @@ def clean_data_api(
                 "imputation": list(imputation_strategy.keys()),
                 "outliers": list(outlier_handling.keys()),
                 "encoded": list(encoding_strategy.keys()),
-                "scaling": scale
+                "scaling": scale,
+                "dropped": columns_to_drop
             }
         })
     except Exception as e:
@@ -132,7 +142,7 @@ def clean_data_api(
 
 def train_and_tune_api(
     target_column: str,
-    models: List[str],
+    models: Dict[str, Dict[str, List[Any]]],
     metric: str,
     metric_direction: str
 ) -> str:
@@ -142,10 +152,25 @@ def train_and_tune_api(
     try:
         dataset = memory.verify_dataset()
         
+        # Debugging logs for target and shapes
+        print(f"DEBUG: Starting train_and_tune on target='{target_column}'")
+        unique_y = np.unique(dataset.get_columns(target_column).data[:, 0])
+        print(f"DEBUG: Unique labels in target: {unique_y}")
+        print(f"DEBUG: Target dtype: {dataset.get_columns(target_column).data[:, 0].dtype}")
+        
         # Prepare evaluation inputs
         feature_cols = [c for c in dataset.columns if c != target_column]
-        X = dataset.get_columns(feature_cols).data.astype(float)
-        y = dataset.get_columns(target_column).data[:, 0].astype(float)
+        X_obj = dataset.get_columns(feature_cols).data
+        y_obj = dataset.get_columns(target_column).data[:, 0]
+        
+        # Check for NaNs
+        nan_count_X = np.isnan(X_obj.astype(float)).sum() if X_obj.size > 0 else 0
+        nan_count_y = np.isnan(y_obj.astype(float)).sum() if y_obj.size > 0 else 0
+        print(f"DEBUG: X shape: {X_obj.shape}, y shape: {y_obj.shape}")
+        print(f"DEBUG: NaN count - X: {nan_count_X}, y: {nan_count_y}")
+
+        X = X_obj.astype(float)
+        y = y_obj.astype(float)
         
         # Map scoring function
         import glassbox.metrics as smetrics
@@ -159,21 +184,16 @@ def train_and_tune_api(
             
         cv = KFoldSplitter(n_splits=3)
         
-        model_space = {
-            "knn": (gmodels.KNeighborsClassifier(), {"n_neighbors": [3, 5, 7]}),
-            "decision_tree": (gmodels.DecisionTreeClassifier(), {"max_depth": [3, 5, 10]}),
-            "random_forest": (gmodels.RandomForestClassifier(), {"n_estimators": [10, 30]})
-        }
-        
         best_score = float("-inf") if metric_direction == "max" else float("inf")
         best_model_name = None
         best_params = None
         
-        for m_name in models:
-            if m_name not in model_space:
+        for m_name, p_grid in models.items():
+            estimator_class = getattr(gmodels, m_name, None)
+            if estimator_class is None:
                 continue
                 
-            estimator, p_grid = model_space[m_name]
+            estimator = estimator_class()
             
             search = GridSearchCV(
                 estimator=estimator,
